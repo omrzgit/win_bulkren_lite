@@ -134,7 +134,7 @@ When scanning directory:
 | `0`     | Cancel         |
 
 
-### 🛡 Duplicate Protection
+### Duplicate Protection
 
 If target exists:
 
@@ -147,7 +147,7 @@ Skip / Overwrite / Cancel-all?
 * Cancel → stop everything
 
 
-### ↩ Undo
+### Undo
 
 After each operation, a log is saved:
 
