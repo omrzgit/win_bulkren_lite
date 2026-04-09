@@ -4,9 +4,7 @@
 > For idk who, its a work in progress, currently allows you to rename to Toggle file suffixes instantly.
 > No setup. No dependencies. Drag & Drop in directory and run.
 
-## Quickstart
-
-### Prerequisites
+### Quickstart
 
 #### Prerequisites
 
@@ -14,7 +12,7 @@
 * Works in `cmd.exe`
 * No admin rights needed
 
-### Setup
+#### Setup
 
 1. Put `renamer.bat` in your target folder
 2. (Optional) Create `ren_config.txt`:
@@ -31,7 +29,7 @@ data\maps\test.ipl
 That’s it. It auto-detects and toggles state.
 
 
-## What it does
+### What it does
 
 You can:
 
@@ -46,7 +44,7 @@ Works great for:
 * Build pipelines
 
 
-## Features
+### Features
 
 **Core**
 - One-click toggle with live state detection
@@ -65,7 +63,7 @@ Works great for:
 - Zero dependencies, single portable file
 
 
-## How it works
+### How it works
 
 The script checks files directly on disk and detects:
 
@@ -79,7 +77,7 @@ The script checks files directly on disk and detects:
 Then it decides what to do.
 
 
-## Config (`ren_config.txt`)
+### Config (`ren_config.txt`)
 
 ```
 .suffix
@@ -96,9 +94,9 @@ Rules:
 * Blank lines ignored
 
 
-## Usage
+### Usage
 
-### Auto Mode (double-click)
+#### Auto Mode (double-click)
 
 * If all original → adds suffix
 * If all renamed → removes suffix
@@ -106,7 +104,7 @@ Rules:
 * If empty → opens menu
 
 
-### Menu (manual control)
+#### Menu (manual control)
 
 ```
 1. Toggle rename/revert
@@ -122,7 +120,7 @@ Rules:
 ```
 
 
-## File Selection
+### File Selection
 
 When scanning directory:
 
@@ -136,7 +134,7 @@ When scanning directory:
 | `0`     | Cancel         |
 
 
-## 🛡 Duplicate Protection
+### 🛡 Duplicate Protection
 
 If target exists:
 
@@ -149,7 +147,7 @@ Skip / Overwrite / Cancel-all?
 * Cancel → stop everything
 
 
-## ↩ Undo
+### ↩ Undo
 
 After each operation, a log is saved:
 
@@ -163,7 +161,7 @@ Undo restores based on what exists.
 * Safe retry if something fails
 
 
-## Files
+### Files
 
 | File             | Purpose      |
 | ---------------- | ------------ |
@@ -172,7 +170,7 @@ Undo restores based on what exists.
 | `ren_undo.log`   | Undo history |
 
 
-## ⚠ Limitations
+### ⚠ Limitations
 
 * Only one suffix per config
 * Suffix is appended at the end
@@ -181,14 +179,14 @@ Undo restores based on what exists.
 * Single-level undo only
 
 
-## Extra Modes Todo
+### Extra Modes Todo
 
 * Prefix mode (add before filename)
 * Mixed-state smart correction
 * Batch-safe operations
 
 
-## License
+### License
 
 MIT. Do whatever you want.
 
