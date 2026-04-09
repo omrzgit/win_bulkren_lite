@@ -11,7 +11,7 @@ Drop it in a folder. Double-click. Done.
 
 ---
 
-## ⚡ Quickstart
+## Quickstart
 
 ### Prerequisites
 
@@ -37,7 +37,7 @@ That’s it. It auto-detects and toggles state.
 
 ---
 
-## 🧠 What it does
+## What it does
 
 You can:
 
@@ -53,20 +53,20 @@ Works great for:
 
 ---
 
-## ✨ Features
+## Features
 
-* 🔁 One-click toggle (auto mode)
-* 🧠 Live state detection (no cache files)
-* 🧩 Handles mixed file states
-* 🛡 Duplicate protection (Skip / Overwrite / Cancel)
-* ↩ Undo last operation
-* 📂 Directory scanner + smart selection
-* 📝 Config editor (opens in Notepad)
-* ➕ Prefix mode (optional toggle behavior)
+* One-click toggle (auto mode)
+* Live state detection (no cache files)
+* Handles mixed file states
+* Duplicate protection (Skip / Overwrite / Cancel)
+* Undo last operation
+* Directory scanner + smart selection
+* Config editor (opens in Notepad)
+* Prefix mode (optional toggle behavior)
 
 ---
 
-## ⚙️ How it works
+## How it works
 
 The script checks files directly on disk and detects:
 
@@ -81,7 +81,7 @@ Then it decides what to do.
 
 ---
 
-## 🧾 Config (`ren_config.txt`)
+## Config (`ren_config.txt`)
 
 ```
 .suffix
@@ -99,7 +99,7 @@ Rules:
 
 ---
 
-## 🎯 Usage
+## Usage
 
 ### Auto Mode (double-click)
 
@@ -127,7 +127,7 @@ Rules:
 
 ---
 
-## 📂 File Selection
+## File Selection
 
 When scanning directory:
 
@@ -171,7 +171,7 @@ Undo restores based on what exists.
 
 ---
 
-## 📁 Files
+## Files
 
 | File             | Purpose      |
 | ---------------- | ------------ |
@@ -191,7 +191,7 @@ Undo restores based on what exists.
 
 ---
 
-## 🧪 Extra Modes
+## Extra Modes
 
 * Prefix mode (add before filename)
 * Mixed-state smart correction
@@ -199,7 +199,7 @@ Undo restores based on what exists.
 
 ---
 
-## 📜 License
+## License
 
 MIT. Do whatever you want.
 
