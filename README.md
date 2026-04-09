@@ -1,13 +1,8 @@
-````markdown
-# Smart File Renamer
 
-Toggle file suffixes instantly. No setup. No dependencies.
-renamer.bat
-````
-
-Drop it in a folder. Double-click. Done.
-
----
+# Win_bulkren_lite
+> Renames / Reverts files with a suffix of choice.
+> For idk who, its a work in progress, currently allows you to rename to Toggle file suffixes instantly.
+> No setup. No dependencies. Drag & Drop in directory and run.
 
 ## Quickstart
 
@@ -53,14 +48,21 @@ Works great for:
 
 ## Features
 
-* One-click toggle (auto mode)
-* Live state detection (no cache files)
-* Handles mixed file states
-* Duplicate protection (Skip / Overwrite / Cancel)
-* Undo last operation
-* Directory scanner + smart selection
-* Config editor (opens in Notepad)
-* Prefix mode (optional toggle behavior)
+**Core**
+- One-click toggle with live state detection
+- Handles mixed file states (some renamed, some not)
+- Directory scanner with smart file selection
+- Optional prefix mode (add to beginning instead of end)
+
+**Safety**
+- Duplicate protection: Skip / Overwrite / Cancel
+- Single-level undo (restores previous state)
+- No cache files—reads actual disk state every run
+
+**Workflow**
+- Built-in config editor
+- Batch-safe operations
+- Zero dependencies, single portable file
 
 ---
 
@@ -189,7 +191,7 @@ Undo restores based on what exists.
 
 ---
 
-## Extra Modes
+## Extra Modes Todo
 
 * Prefix mode (add before filename)
 * Mixed-state smart correction
