@@ -6,6 +6,8 @@
 
 ## Quickstart
 
+### Prerequisites
+
 #### Prerequisites
 
 * Windows 7+
