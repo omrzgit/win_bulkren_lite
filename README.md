@@ -1,5 +1,5 @@
 
-# Win_bulkren_lite
+# Win_Bulkren_lite
 > Renames / Reverts files with a suffix of choice.
 > For idk who, its a work in progress, currently allows you to rename to Toggle file suffixes instantly.
 > No setup. No dependencies. Drag & Drop in directory and run.
