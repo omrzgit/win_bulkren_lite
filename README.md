@@ -170,7 +170,7 @@ Undo restores based on what exists.
 | `ren_undo.log`   | Undo history |
 
 
-### ⚠ Limitations
+### Limitations
 
 * Only one suffix per config
 * Suffix is appended at the end
@@ -189,6 +189,3 @@ Undo restores based on what exists.
 ### License
 
 MIT. Do whatever you want.
-
-```
-```
