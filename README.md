@@ -3,7 +3,7 @@
 
 Toggle file suffixes instantly. No setup. No dependencies.
 
-````bat
+bat
 renamer.bat
 ````
 
