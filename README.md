@@ -28,7 +28,6 @@ data\maps\test.ipl
 
 That’s it. It auto-detects and toggles state.
 
----
 
 ## What it does
 
@@ -44,7 +43,6 @@ Works great for:
 * Config switching
 * Build pipelines
 
----
 
 ## Features
 
@@ -64,7 +62,6 @@ Works great for:
 - Batch-safe operations
 - Zero dependencies, single portable file
 
----
 
 ## How it works
 
@@ -79,7 +76,6 @@ The script checks files directly on disk and detects:
 
 Then it decides what to do.
 
----
 
 ## Config (`ren_config.txt`)
 
@@ -97,7 +93,6 @@ Rules:
 * `#` = comment
 * Blank lines ignored
 
----
 
 ## Usage
 
@@ -108,7 +103,6 @@ Rules:
 * If mixed → fixes everything
 * If empty → opens menu
 
----
 
 ### Menu (manual control)
 
@@ -125,7 +119,6 @@ Rules:
 0. Exit
 ```
 
----
 
 ## File Selection
 
@@ -140,7 +133,6 @@ When scanning directory:
 | `N`     | Only new files |
 | `0`     | Cancel         |
 
----
 
 ## 🛡 Duplicate Protection
 
@@ -154,7 +146,6 @@ Skip / Overwrite / Cancel-all?
 * Overwrite → replace
 * Cancel → stop everything
 
----
 
 ## ↩ Undo
 
@@ -169,7 +160,6 @@ Undo restores based on what exists.
 * Only last operation supported
 * Safe retry if something fails
 
----
 
 ## Files
 
@@ -179,7 +169,6 @@ Undo restores based on what exists.
 | `ren_config.txt` | Config       |
 | `ren_undo.log`   | Undo history |
 
----
 
 ## ⚠ Limitations
 
@@ -189,7 +178,6 @@ Undo restores based on what exists.
 * Uses relative paths
 * Single-level undo only
 
----
 
 ## Extra Modes Todo
 
@@ -197,7 +185,6 @@ Undo restores based on what exists.
 * Mixed-state smart correction
 * Batch-safe operations
 
----
 
 ## License
 
