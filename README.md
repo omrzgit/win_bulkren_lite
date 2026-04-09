@@ -2,8 +2,6 @@
 # Smart File Renamer
 
 Toggle file suffixes instantly. No setup. No dependencies.
-
-bat
 renamer.bat
 ````
 
