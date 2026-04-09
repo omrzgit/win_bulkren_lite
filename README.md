@@ -6,7 +6,7 @@
 
 ## Quickstart
 
-### Prerequisites
+#### Prerequisites
 
 * Windows 7+
 * Works in `cmd.exe`
