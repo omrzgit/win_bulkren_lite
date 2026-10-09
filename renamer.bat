@@ -8,6 +8,7 @@ rem  Uses ren_undo.log to track last operation for undo
 rem ============================================================
 set "CONFIG=ren_config.txt"
 set "UNDO_LOG=ren_undo.log"
+set "TX_LOG=ren_transactions.log"
 
 rem Auto-mode: if config exists, detect state from disk and act
 if exist "%CONFIG%" (
@@ -64,6 +65,8 @@ if "!current_state!"=="mixed" (
     exit /b
 )
 
+call :log_transaction "AUTO_START" "Auto-mode execution triggered (State: !current_state!, Suffix: !SUFFIX!)" "IN_PROGRESS"
+
 if "!current_state!"=="original" (
     echo Action: RENAME -- adding !SUFFIX!
     echo.
@@ -73,6 +76,8 @@ if "!current_state!"=="original" (
     echo.
     call :do_revert
 )
+
+call :log_transaction "AUTO_END" "Auto-mode completed" "SUCCESS"
 
 echo.
 echo Operation complete.
@@ -116,11 +121,12 @@ echo  4. Scan directory  (pick files to add^)
 echo  5. Add file manually
 echo  6. Remove file from config
 echo  7. Undo last operation
-echo  8. Edit config in Notepad
-echo  9. Close and reinitialize (restart bat^)
+echo  8. View transaction log
+echo  9. Edit config in Notepad
+echo  R. Close and reinitialize (restart bat^)
 echo  0. Exit
 echo.
-set /p "choice=Choose (0-9): "
+set /p "choice=Choose (0-9, L, R): "
 
 if "!choice!"=="1" ( call :action_toggle        & goto :menu_main )
 if "!choice!"=="2" ( call :action_change_suffix & goto :menu_main )
@@ -129,8 +135,10 @@ if "!choice!"=="4" ( call :action_scan_dir      & goto :menu_main )
 if "!choice!"=="5" ( call :action_add_file      & goto :menu_main )
 if "!choice!"=="6" ( call :action_remove_file   & goto :menu_main )
 if "!choice!"=="7" ( call :action_undo          & goto :menu_main )
-if "!choice!"=="8" ( call :action_edit_notepad  & goto :menu_main )
-if "!choice!"=="9" ( call :action_reinit        & goto :eof )
+if "!choice!"=="8" ( call :action_view_log      & goto :menu_main )
+if /i "!choice!"=="L" ( call :action_view_log   & goto :menu_main )
+if "!choice!"=="9" ( call :action_edit_notepad  & goto :menu_main )
+if /i "!choice!"=="R" ( call :action_reinit     & goto :eof )
 if "!choice!"=="0" exit /b 0
 
 echo Invalid choice.
@@ -179,7 +187,12 @@ if "!current_state!"=="mixed" (
 )
 echo.
 set /p "ok=Proceed? (Y/N): "
-if /i not "!ok!"=="Y" exit /b
+if /i not "!ok!"=="Y" (
+    call :log_transaction "TOGGLE_CANCEL" "Toggle cancelled by user" "CANCELLED"
+    exit /b
+)
+
+call :log_transaction "TOGGLE_START" "Initiating toggle (State: !current_state!, Suffix: !SUFFIX!)" "IN_PROGRESS"
 
 if "!current_state!"=="original" ( call :do_rename & goto :toggle_done )
 if "!current_state!"=="renamed"  ( call :do_revert & goto :toggle_done )
@@ -196,6 +209,7 @@ if "!current_state!"=="mixed" (
 )
 
 :toggle_done
+call :log_transaction "TOGGLE_END" "Toggle completed" "SUCCESS"
 echo.
 pause
 exit /b
@@ -224,6 +238,7 @@ for /l %%i in (1,1,!FILE_COUNT!) do (
     echo !FILE_%%i!>>"!tmp_cfg!"
 )
 move /y "!tmp_cfg!" "%CONFIG%" >nul
+call :log_transaction "CONFIG" "Changed suffix from '!SUFFIX!' to '!new_suffix!'" "SUCCESS"
 echo [OK] Suffix changed to: !new_suffix!
 pause
 exit /b
@@ -477,6 +492,7 @@ if not exist "!new_file!" (
 )
 
 echo !new_file!>>"%CONFIG%"
+call :log_transaction "CONFIG" "Added file '!new_file!' to config" "SUCCESS"
 echo [OK] Added: !new_file!
 pause
 exit /b
@@ -516,6 +532,7 @@ for /l %%i in (1,1,!FILE_COUNT!) do (
     )
 )
 move /y "!tmp_cfg!" "%CONFIG%" >nul
+call :log_transaction "CONFIG" "Removed file '!to_remove!' from config" "SUCCESS"
 echo [OK] Removed: !to_remove!
 set "to_remove="
 pause
@@ -561,7 +578,12 @@ for /l %%i in (1,1,!undo_count!) do (
 set "u_orig=" & set "u_ren="
 echo.
 set /p "ok=Proceed with undo? (Y/N): "
-if /i not "!ok!"=="Y" exit /b
+if /i not "!ok!"=="Y" (
+    call :log_transaction "UNDO_CANCEL" "Undo cancelled by user" "CANCELLED"
+    exit /b
+)
+
+call :log_transaction "UNDO_START" "Starting undo for !undo_count! file pair(s)" "IN_PROGRESS"
 
 set "err=0"
 for /l %%i in (1,1,!undo_count!) do (
@@ -574,6 +596,7 @@ for /l %%i in (1,1,!undo_count!) do (
         if exist "!u_orig!" (
             echo [WARN] Undo skipped: "!u_orig!" already exists on disk.
             echo        Remove it manually then retry.
+            call :log_transaction "UNDO_SKIP" "Target already exists: '!u_orig!'" "SKIPPED"
             set "err=1"
         ) else (
             ren "!u_ren!" "!u_orig!"
@@ -585,6 +608,7 @@ for /l %%i in (1,1,!undo_count!) do (
         if exist "!u_ren!" (
             echo [WARN] Undo skipped: "!u_ren!" already exists on disk.
             echo        Remove it manually then retry.
+            call :log_transaction "UNDO_SKIP" "Target already exists: '!u_ren!'" "SKIPPED"
             set "err=1"
         ) else (
             ren "!u_orig!" "!u_ren!"
@@ -592,15 +616,18 @@ for /l %%i in (1,1,!undo_count!) do (
         )
     ) else (
         echo [SKIP] Neither version found for: !u_orig!
+        call :log_transaction "UNDO_SKIP" "Neither version found on disk for '!u_orig!'" "SKIPPED"
     )
 )
 set "u_orig=" & set "u_ren="
 
 if "!err!"=="0" (
     del "%UNDO_LOG%" >nul 2>&1
+    call :log_transaction "UNDO_END" "Undo completed successfully" "SUCCESS"
     echo.
     echo [OK] Undo complete. Log cleared.
 ) else (
+    call :log_transaction "UNDO_END" "Undo completed with warnings" "PARTIAL_FAIL"
     echo.
     echo [!] One or more files could not be undone. Log kept.
 )
@@ -740,17 +767,22 @@ for /l %%i in (1,1,!FILE_COUNT!) do (
             set /p "_choice=  Skip / Overwrite / Cancel-all? (S/O/C): "
             if /i "!_choice!"=="C" (
                 echo [ABORT] Rename cancelled by user.
+                call :log_transaction "COLLISION_ABORT" "Rename cancelled by user on collision with '!ren!'" "CANCELLED"
                 set "op_err=1"
                 rem Set flag to break remaining iterations
                 set "ren_abort=1"
             )
             if /i "!_choice!"=="O" (
+                call :log_transaction "OVERWRITE" "Overwriting '!ren!' for '!orig!'" "IN_PROGRESS"
                 del "!ren!" >nul 2>&1
                 ren "!orig!" "!ren!"
                 call :check_ren "!ren!" "!orig!" rename
             )
             rem S or anything else: skip silently
-            if /i "!_choice!"=="S" echo  [SKIP] Skipped: !orig!
+            if /i "!_choice!"=="S" (
+                call :log_transaction "COLLISION" "Target already exists: '!ren!' - skipped" "SKIPPED"
+                echo  [SKIP] Skipped: !orig!
+            )
         ) else (
             ren "!orig!" "!ren!"
             call :check_ren "!ren!" "!orig!" rename
@@ -788,15 +820,20 @@ for /l %%i in (1,1,!FILE_COUNT!) do (
             set /p "_choice=  Skip / Overwrite / Cancel-all? (S/O/C): "
             if /i "!_choice!"=="C" (
                 echo [ABORT] Revert cancelled by user.
+                call :log_transaction "COLLISION_ABORT" "Revert cancelled by user on collision with '!orig!'" "CANCELLED"
                 set "op_err=1"
                 set "rev_abort=1"
             )
             if /i "!_choice!"=="O" (
+                call :log_transaction "OVERWRITE" "Overwriting '!orig!' for '!ren!'" "IN_PROGRESS"
                 del "!orig!" >nul 2>&1
                 ren "!ren!" "!orig!"
                 call :check_ren "!orig!" "!ren!" revert
             )
-            if /i "!_choice!"=="S" echo  [SKIP] Skipped: !ren!
+            if /i "!_choice!"=="S" (
+                call :log_transaction "COLLISION" "Target already exists: '!orig!' - skipped" "SKIPPED"
+                echo  [SKIP] Skipped: !ren!
+            )
         ) else (
             ren "!ren!" "!orig!"
             call :check_ren "!orig!" "!ren!" revert
@@ -827,15 +864,57 @@ if exist "!_expected!" (
     if /i "!_dir!"=="rename" (
         rem _old was original, _expected is renamed
         echo !_old!^|!_expected!>>"%UNDO_LOG%"
+        call :log_transaction "RENAME" "Renamed '!_old!' -> '!_expected!'" "SUCCESS"
         echo  [OK] Renamed : !_old! -^> !_expected!
     ) else (
         rem _old was renamed, _expected is original
         echo !_expected!^|!_old!>>"%UNDO_LOG%"
+        call :log_transaction "REVERT" "Reverted '!_old!' -> '!_expected!'" "SUCCESS"
         echo  [OK] Reverted: !_old! -^> !_expected!
     )
 ) else (
     echo  [ERR] Operation failed: !_old! could not be processed.
+    call :log_transaction "ERROR" "Failed to process '!_old!' -> '!_expected!'" "FAILED"
     set "op_err=1"
 )
 set "_expected=" & set "_old=" & set "_dir="
+exit /b
+
+
+rem ════════════════════════════════════════════════════════════
+:action_view_log
+rem Displays recent entries from the rolling transaction log.
+rem ════════════════════════════════════════════════════════════
+cls
+echo ========================================
+echo  Transaction Log  [RECENT EVENTS]
+echo  File: %TX_LOG%
+echo ========================================
+if not exist "%TX_LOG%" (
+    echo  (No transactions logged yet)
+) else (
+    powershell -NoProfile -Command "Get-Content -LiteralPath '%TX_LOG%' -Tail 25" 2>nul
+)
+echo ========================================
+echo.
+echo  [O] Open full log in Notepad
+echo  [0] Return to menu
+echo.
+set /p "_log_act=Choice [0]: "
+if /i "!_log_act!"=="O" (
+    start "" "%TX_LOG%"
+)
+set "_log_act="
+exit /b
+
+
+rem ════════════════════════════════════════════════════════════
+:log_transaction
+rem <TAG> <MESSAGE> <STATUS>
+rem Appends to %TX_LOG% and caps at 100 entries (rolling buffer).
+rem Inspired by manage_skills_script transaction control system.
+rem ════════════════════════════════════════════════════════════
+set "LOG_TIME=%DATE% %TIME%"
+echo [!LOG_TIME!] [%~1] %~2 [%~3]>>"%TX_LOG%"
+powershell -NoProfile -Command "$p = '%TX_LOG%'; if (Test-Path -LiteralPath $p) { $c = Get-Content -LiteralPath $p; if ($c.Count -gt 100) { $c[-100..-1] | Set-Content -LiteralPath $p } }" >nul 2>&1
 exit /b

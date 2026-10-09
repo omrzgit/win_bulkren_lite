@@ -1,7 +1,6 @@
-
 # Win_Bulkren_lite
 > Renames / Reverts files with a suffix of choice.
-> For idk who, its a work in progress, currently allows you to rename to Toggle file suffixes instantly.
+> Toggle file suffixes instantly with state detection and built-in transaction safety.
 > No setup. No dependencies. Drag & Drop in directory and run.
 
 ### Quickstart
@@ -33,13 +32,13 @@ That’s it. It auto-detects and toggles state.
 
 You can:
 
-* Add a suffix (e.g. `.bak`, `.disabled`)
+* Add a suffix (e.g. `.bak`, `.disabled`, `.datebug`)
 * Remove it later
 * Toggle everything with one click
 
 Works great for:
 
-* Modding workflows
+* Modding workflows (GTA, Elder Scrolls, etc.)
 * Config switching
 * Build pipelines
 
@@ -50,12 +49,14 @@ Works great for:
 - One-click toggle with live state detection
 - Handles mixed file states (some renamed, some not)
 - Directory scanner with smart file selection
-- Optional prefix mode (add to beginning instead of end)
+- Built-in config editor
 
-**Safety**
-- Duplicate protection: Skip / Overwrite / Cancel
-- Single-level undo (restores previous state)
-- No cache files—reads actual disk state every run
+**Safety & Transaction Control**
+- **Rolling Transaction Log (`ren_transactions.log`)**: Automatically audits every rename, revert, config change, and abort with timestamps, capped at the last 100 entries.
+- **Duplicate & Collision Protection**: Prompts `Skip / Overwrite / Cancel-all` before overwriting target files.
+- **Journaled Undo (`ren_undo.log`)**: Reverts the last operation based on disk state with duplicate protection.
+- **Built-in Log Viewer**: View recent transaction events directly inside the menu or open in Notepad.
+- Zero cache files—reads actual disk state every run.
 
 **Workflow**
 - Built-in config editor
@@ -100,7 +101,7 @@ Rules:
 
 * If all original → adds suffix
 * If all renamed → removes suffix
-* If mixed → fixes everything
+* If mixed → prompts to resolve per-file
 * If empty → opens menu
 
 
@@ -109,13 +110,14 @@ Rules:
 ```
 1. Toggle rename/revert
 2. Change suffix
-3. Refresh file status
-4. Scan directory
+3. View file status
+4. Scan directory (pick files to add)
 5. Add file manually
 6. Remove file from config
 7. Undo last operation
-8. Edit config
-9. Restart script
+8. View transaction log
+9. Edit config in Notepad
+R. Close and reinitialize (restart bat)
 0. Exit
 ```
 
@@ -139,51 +141,47 @@ When scanning directory:
 If target exists:
 
 ```
-Skip / Overwrite / Cancel-all?
+Skip / Overwrite / Cancel-all? (S/O/C)
 ```
 
 * Skip → ignore file
 * Overwrite → replace
-* Cancel → stop everything
+* Cancel-all → abort remaining operations safely and log abort event
 
 
-### Undo
+### Transaction Control & Undo
 
-After each operation, a log is saved:
+Every operation generates timestamped entries in `ren_transactions.log`:
 
 ```
-file.cfg|file.cfg.bak
+[Fri 10/09/2026 05:00:00.00] [TOGGLE_START] Initiating toggle (State: original, Suffix: .bak) [IN_PROGRESS]
+[Fri 10/09/2026 05:00:00.05] [RENAME] Renamed 'file1.cfg' -> 'file1.cfg.bak' [SUCCESS]
+[Fri 10/09/2026 05:00:00.10] [TOGGLE_END] Toggle completed [SUCCESS]
 ```
 
-Undo restores based on what exists.
+Undo restores files based on disk existence:
 
-* Only last operation supported
-* Safe retry if something fails
+* Reads pair entries from `ren_undo.log`
+* Detects whether file is currently renamed or original
+* Logs every undo restoration to `ren_transactions.log`
+* Clears journal when all files are successfully restored
 
 
 ### Files
 
-| File             | Purpose      |
-| ---------------- | ------------ |
-| `renamer.bat`    | Main script  |
-| `ren_config.txt` | Config       |
-| `ren_undo.log`   | Undo history |
+| File                   | Purpose                                                |
+| ---------------------- | ------------------------------------------------------ |
+| `renamer.bat`          | Main script                                            |
+| `ren_config.txt`       | Config (suffix + tracked file list)                    |
+| `ren_undo.log`         | Journal of last operation for undo                     |
+| `ren_transactions.log` | Rolling transaction audit log (capped at 100 entries)  |
 
 
 ### Limitations
 
 * Only one suffix per config
-* Suffix is appended at the end
-  (`file.cfg → file.cfg.bak`)
+* Suffix is appended at the end (`file.cfg` → `file.cfg.bak`)
 * Uses relative paths
-* Single-level undo only
-
-
-### Extra Modes Todo
-
-* Prefix mode (add before filename)
-* Mixed-state smart correction
-* Batch-safe operations
 
 
 ### License
